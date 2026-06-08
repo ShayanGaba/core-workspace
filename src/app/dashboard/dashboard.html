@@ -1,0 +1,103 @@
+<div class="min-h-screen bg-zinc-950 text-zinc-100 p-6 font-mono selection:bg-zinc-800 flex flex-col justify-between">
+  
+  <header class="border border-zinc-900 bg-zinc-900/30 p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="flex items-center gap-4">
+      <a routerLink="/" class="text-xs text-zinc-500 hover:text-zinc-300 transition">&larr; [ BACK_TO_CORE ]</a>
+      <span class="text-zinc-600">|</span>
+      <span class="text-xs font-bold text-emerald-500 uppercase">// MODULE_03 // ASSET_TELEMETRY</span>
+    </div>
+    <div class="text-right md:text-right">
+      <span class="text-[10px] text-zinc-500 uppercase tracking-wider block">Total Pipeline Value</span>
+      <span class="text-2xl font-bold font-sans text-zinc-100 tracking-tight">${{ totalValue() }}</span>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full mx-auto my-8">
+    
+    <section class="border border-zinc-900 p-6 bg-zinc-900/10 h-fit">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 border-b border-zinc-900 pb-2">// Asset Ingestion</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-[10px] text-zinc-500 uppercase block mb-1">Asset Reference Name</label>
+          <input #nameInput type="text" placeholder="e.g., Vercel API Gateway" class="w-full bg-zinc-950 border border-zinc-900 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700 font-sans" />
+        </div>
+        <div>
+          <label class="text-[10px] text-zinc-500 uppercase block mb-1">Operational Cluster</label>
+          <select #categoryInput class="w-full bg-zinc-950 border border-zinc-900 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700">
+            <option value="Hardware">Hardware</option>
+            <option value="Subscription">Subscription</option>
+            <option value="Crypto">Crypto</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] text-zinc-500 uppercase block mb-1">Financial Valuation ($)</label>
+          <input #valueInput type="number" placeholder="0.00" class="w-full bg-zinc-950 border border-zinc-900 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700 font-sans" />
+        </div>
+        <button (click)="submitAsset(nameInput, categoryInput, valueInput)" class="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold py-2 px-4 text-xs uppercase tracking-wider transition">
+          Commit Asset to State
+        </button>
+      </div>
+    </section>
+
+    <section class="lg:col-span-2 border border-zinc-900 p-6 bg-zinc-900/10">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 border-b border-zinc-900 pb-2">// Active Operational Pools</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="border-b border-zinc-900 text-zinc-500 uppercase tracking-wider">
+              <th class="pb-3 font-medium w-12 pl-2">#</th>
+              <th class="pb-3 font-medium">Asset Identity</th>
+              <th class="pb-3 font-medium">Asset Cluster</th>
+              <th class="pb-3 font-medium text-right">Value</th>
+              <th class="pb-3 font-medium text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-900/50">
+            @for (asset of assetPool(); track asset.id) {
+              <tr class="hover:bg-zinc-900/20 transition">
+                <td class="py-4 font-mono text-xs text-zinc-600 w-12 pl-2">#{{ $index + 1 }}</td>
+                
+                @if (asset.isEditing) {
+                  <td class="py-2"><input #editName type="text" [value]="asset.name" class="bg-zinc-950 border border-zinc-800 px-2 py-1 text-xs text-zinc-200 focus:outline-none font-sans w-full max-w-[160px]" /></td>
+                  <td class="py-2">
+                    <select #editCat class="bg-zinc-950 border border-zinc-800 px-2 py-1 text-xs text-zinc-200 focus:outline-none">
+                      <option value="Hardware" [selected]="asset.category === 'Hardware'">Hardware</option>
+                      <option value="Subscription" [selected]="asset.category === 'Subscription'">Subscription</option>
+                      <option value="Crypto" [selected]="asset.category === 'Crypto'">Crypto</option>
+                    </select>
+                  </td>
+                  <td class="py-2 text-right"><input #editVal type="number" [value]="asset.value" class="bg-zinc-950 border border-zinc-800 px-2 py-1 text-xs text-zinc-200 focus:outline-none text-right font-sans w-20" /></td>
+                  <td class="py-2 text-center space-x-1">
+                    <button (click)="saveEdit(asset.id, editName.value, editCat.value, editVal.value)" class="text-emerald-400 hover:text-emerald-300 font-bold px-1">[SAVE]</button>
+                    <button (click)="startEdit(asset.id)" class="text-zinc-600 hover:text-zinc-400 font-bold px-1">[X]</button>
+                  </td>
+                } @else {
+                  <td class="py-4"><span class="text-zinc-300 font-sans text-xs font-semibold">{{ asset.name }}</span></td>
+                  <td class="py-4">
+                    <span [class]="'px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-tight ' + 
+                      (asset.category === 'Hardware' ? 'bg-blue-950/40 text-blue-400 border border-blue-900/30' : 
+                       asset.category === 'Subscription' ? 'bg-amber-950/40 text-amber-400 border border-amber-900/30' : 
+                       'bg-purple-950/40 text-purple-400 border border-purple-900/30')">
+                      {{ asset.category }}
+                    </span>
+                  </td>
+                  <td class="py-4 text-right font-bold font-sans text-sm text-zinc-300">${{ asset.value }}</td>
+                  <td class="py-4 text-center space-x-2">
+                    <button (click)="startEdit(asset.id)" class="text-zinc-500 hover:text-zinc-300 font-bold px-1">[EDIT]</button>
+                    <button (click)="killAsset(asset.id)" class="text-zinc-600 hover:text-red-400 font-bold px-1">[TERMINATE]</button>
+                  </td>
+                }
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="py-8 text-center text-zinc-600 italic">State registry contains zero allocated records.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer class="text-[10px] text-zinc-600 text-center uppercase tracking-wide">Data stream allocation stable // Computed mapping signals running natively.</footer>
+</div>

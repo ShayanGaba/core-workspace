@@ -1,0 +1,44 @@
+<div class="min-h-screen bg-zinc-950 text-zinc-100 p-6 font-mono selection:bg-zinc-800 flex flex-col justify-between">
+  
+  <header class="border border-zinc-900 bg-zinc-900/30 p-4 flex justify-between items-center">
+    <div class="flex items-center gap-4">
+      <a routerLink="/" class="text-xs text-zinc-500 hover:text-zinc-300 transition">&larr; [ BACK_TO_CORE ]</a>
+      <span class="text-zinc-600">|</span>
+      <span class="text-xs font-bold text-blue-500 uppercase">// MODULE_01 // PULSE_METER</span>
+    </div>
+  </header>
+
+  <main class="max-w-xl w-full mx-auto my-auto border border-zinc-900 p-8 bg-zinc-900/10">
+    <div class="text-center mb-8">
+      <span class="text-[10px] uppercase tracking-widest text-zinc-600 block mb-2">Live Output Diagnostic</span>
+      <div class="text-6xl font-bold font-sans tracking-tight text-zinc-100 my-4">{{ pulseCount() }}</div>
+      <div class="text-xs text-zinc-400">TELEMETRY_STATUS: <span class="text-blue-400 font-bold">{{ pulseIntensity() }}</span></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 border-t border-b border-zinc-900 py-6 my-6">
+      <button (click)="adjustPulse('DOWN')" class="bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold py-3 text-xs uppercase tracking-wider transition">
+        [-] Attenuate Pulse
+      </button>
+      <button (click)="adjustPulse('UP')" class="bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold py-3 text-xs uppercase tracking-wider transition">
+        [+] Amplify Pulse
+      </button>
+    </div>
+
+    <div class="flex items-center justify-between text-xs">
+      <span class="text-zinc-500">Step Multiplier Factor:</span>
+      <div class="flex border border-zinc-900 divide-x divide-zinc-900 bg-zinc-950">
+        @for (size of [1, 5, 10, 50]; track size) {
+          <button (click)="setStep(size)" [class]="'px-3 py-1 text-[10px] font-bold transition ' + (stepValue() === size ? 'bg-blue-950 text-blue-400' : 'text-zinc-500 hover:text-zinc-300')">
+            {{ size }}x
+          </button>
+        }
+      </div>
+    </div>
+
+    <button (click)="purgePulse()" class="w-full mt-6 bg-red-950/20 hover:bg-red-950/40 border border-red-900/50 text-red-400 text-[10px] font-bold uppercase tracking-widest py-2 transition">
+      System State Cleansing [PURGE]
+    </button>
+  </main>
+
+  <footer class="text-[10px] text-zinc-600 text-center uppercase tracking-wide">Telemetry system loop clear // 0ms delay factor.</footer>
+</div>
